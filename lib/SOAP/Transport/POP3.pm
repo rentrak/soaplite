@@ -62,7 +62,7 @@ sub handle {
   # fixes [ 1.17700 ] POP3 Processes Messages Out of Order
   foreach my $msgid (sort { $a <=> $b } (keys(%{$messages}) ) ) {
   # foreach my $msgid (keys %$messages) {
-    $self->SUPER::handle(join '', @{$self->get($msgid)});
+    $self->handle_request(join '', @{$self->get($msgid)});
   } continue {
     $self->delete($msgid);
   }

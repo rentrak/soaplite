@@ -58,7 +58,7 @@ sub out {
     return $self;
 }
 
-sub handle {
+sub handle_request {
     my $self = shift->new;
 
     $self->in(*STDIN)->out(*STDOUT) unless defined $self->in;

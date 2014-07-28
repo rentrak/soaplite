@@ -386,6 +386,11 @@ sub BEGIN {
 }
 
 sub handle {
+    my $self = shift->new();
+    $self->handle_request();
+}
+
+sub handle_request {
     my $self = shift->new;
 
     &{$self->{debug_logger}}($self->request->content);
@@ -450,7 +455,7 @@ sub handle {
       ? Compress::Zlib::uncompress( $self->request->content )
       : $self->request->content;
 
-    my $response = $self->SUPER::handle(
+    my $response = $self->SUPER::handle_request(
         $self->request->content_type =~ m!^multipart/!
         ? join( "\n", $self->request->headers_as_string, $content )
         : $content
@@ -615,7 +620,8 @@ sub handle {
                 ),
                 $content,
             ) );
-        $self->SUPER::handle;
+
+        $self->handle_request();
     }
 
     # imitate nph- cgi for IIS (pointed by Murray Nesbitt)
@@ -711,7 +717,7 @@ sub handle {
     while ( my $c = $self->accept ) {
         while ( my $r = $c->get_request ) {
             $self->request($r);
-            $self->SUPER::handle;
+            $self->handle_request();
             eval {
                 local $SIG{PIPE} = sub {die "SIGPIPE"};
                 $c->send_response( $self->response );
@@ -843,7 +849,8 @@ sub handler {
             HTTP::Headers->new( %headers ),
             $content
         ) );
-    $self->SUPER::handle;
+
+    $self->handle_request();
 
     # we will specify status manually for Apache, because
     # if we do it as it has to be done, returning SERVER_ERROR,
@@ -929,11 +936,12 @@ sub new {
 sub handle {
     my $self = shift->new;
 
-    my ( $r1, $r2 );
+    my $request;
+    my $response;
     my $fcgirq = $self->{_fcgirq};
 
-    while ( ( $r1 = $fcgirq->Accept() ) >= 0 ) {
-        $r2 = $self->SUPER::handle;
+    while ( ( $request = $fcgirq->Accept() ) >= 0 ) {
+        $response = $self->SUPER::handle();
     }
 
     return undef;

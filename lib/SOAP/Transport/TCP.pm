@@ -217,7 +217,7 @@ sub handle {
       if (my $rc = $session->read($data, 4096)) {
         $data{$session} .= $data if $rc > 0;
       } else {
-        $session->write($self->SUPER::handle(delete $data{$session}));
+        $session->write($self->handle_request(delete $data{$session}));
         $session->close;
       }
     }

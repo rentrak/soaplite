@@ -2830,6 +2830,11 @@ sub find_target {
 }
 
 sub handle {
+    my $self = shift;
+    $self->handle_request(@_);
+}
+
+sub handle_request {
     SOAP::Trace::trace('()');
     my $self = shift;
     $self = $self->new if !ref $self; # inits the server when called in a static context
@@ -2943,7 +2948,7 @@ sub handle {
     # died with complex detail
     return $self->make_fault($SOAP::Constants::FAULT_SERVER, 'Application error' => $@);
 
-} # end of handle()
+} # end of handle_request()
 
 sub make_fault {
     my $self = shift;
